@@ -1,23 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import MapComponent from './MapComponent';
+import { fetchYears } from './api';
 
 function App() {
+  const [years, setYears] = useState([]);
+  const [selectedYear, setSelectedYear] = useState(null);
+
+  console.log("Starting app");
+  useEffect(() => {
+    console.log("fetching years");
+    fetchYears()
+      .then(res => {
+        setYears(res.data);
+        if (res.data.length > 0) setSelectedYear(res.data[0]);
+      })
+      .catch(() => setYears([]));
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h2 style={{ textAlign: 'center' }}>Water Quality Map</h2>
+      <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+        <select onChange={(e) => setSelectedYear(e.target.value)} value={selectedYear || ''}>
+          {years.map(year => (
+            <option key={year} value={year}>{year}</option>
+          ))}
+        </select>
+      </div>
+      {/* <MapComponent year='2019' /> */}
+      {selectedYear && <MapComponent year={selectedYear} />}
     </div>
   );
 }
